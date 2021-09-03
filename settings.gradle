@@ -1,0 +1,6 @@
+rootProject.name = "Modular"
+include ':app'
+include ':webview'
+include ':annotation'
+include ':compiler'
+include ':common'

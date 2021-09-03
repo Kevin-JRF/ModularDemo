@@ -1,0 +1,92 @@
+if(isRelease){
+    apply plugin : 'com.android.library'
+}else{
+    apply plugin : 'com.android.application'
+}
+apply plugin : 'kotlin-android'
+apply plugin : 'kotlin-kapt'
+
+
+android {
+    compileSdkVersion androidID.compileSdkVersion
+    buildToolsVersion androidID.buildToolsVersion
+
+    defaultConfig {
+
+        if (!isRelease){
+            applicationId appID.net
+        }
+        minSdkVersion androidID.minSdkVersion
+        targetSdkVersion androidID.targetSdkVersion
+        versionCode androidID.versionCode
+        versionName androidID.versionName
+
+        testInstrumentationRunner androidID.testInstrumentationRunner
+
+        buildConfigField("boolean","isRelease",String.valueOf(isRelease))
+    }
+
+    buildTypes {
+        debug {
+            buildConfigField("String", "HOST","\"${url.debug}\"")
+        }
+        release {
+            buildConfigField("String", "HOST","\"${url.release}\"")
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+
+    sourceSets {
+        main {
+            if (isRelease){
+                manifest.srcFile 'src/main/AndroidManifest.xml'
+
+                java {
+                    exclude "**/debug/**"
+                }
+
+            }else{
+                manifest.srcFile 'src/main/debug/AndroidManifest.xml'
+            }
+
+        }
+    }
+
+    kapt {
+        arguments {
+            arg("moduleName", "webview")
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+    kotlinOptions {
+        jvmTarget = '1.8'
+    }
+
+    dataBinding {
+        enabled true
+    }
+
+}
+
+dependencies {
+
+    dependenciesID.each { _, v -> implementation v }
+
+    implementation  'com.scwang.smart:refresh-layout-kernel:2.0.3'
+    implementation  'com.scwang.smart:refresh-header-classics:2.0.3'
+
+    implementation project(":annotation")
+    kapt project(path: ":compiler")
+
+    api project(":common")
+
+
+    api "com.google.auto.service:auto-service:1.0-rc7"
+    kapt "com.google.auto.service:auto-service:1.0-rc7"
+
+}
